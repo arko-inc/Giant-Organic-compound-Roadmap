@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Organic Conversion Roadmap (Interactive)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .no-select { user-select: none; -webkit-user-select: none; }
+    .grab { cursor: grab; }
+    .grabbing { cursor: grabbing; }
+    .shadow-soft { box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+    .glass { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100">
+  <header class="sticky top-0 z-40 bg-slate-950/70 glass border-b border-white/10">
+    <div class="mx-auto max-w-[1600px] px-4 py-3 flex items-center gap-3">
+      <div class="flex items-center gap-2">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400/90 to-sky-400/90 shadow-soft"></div>
+        <div>
+          <div class="text-lg font-bold leading-tight">Organic Conversion Roadmap</div>
+          <div class="text-xs text-slate-300">Pan + Zoom • Search • Filter • Click nodes to study</div>
+        </div>
+      </div>
+
+      <div class="ml-auto flex items-center gap-2 w-full max-w-[820px]">
+        <div class="relative flex-1">
+          <input id="search"
+            class="w-full rounded-2xl bg-white/5 border border-white/10 px-4 py-2 pl-10 outline-none focus:border-sky-400/60 focus:ring-2 focus:ring-sky-400/15"
+            placeholder="Search: alcohol, ester, KMnO4, SOCl2, diazonium, dehydration..."
+          />
+          <div class="absolute left-3 top-2.5 text-slate-400">🔎</div>
+        </div>
+
+        <button id="resetView"
+          class="rounded-2xl px-4 py-2 bg-white/5 border border-white/10 hover:bg-white/10 active:scale-[0.98] transition">
+          Reset View
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-[1600px] px-4 py-4 grid grid-cols-12 gap-4">
+    <aside class="col-span-12 lg:col-span-3 space-y-4">
+      <section class="rounded-3xl bg-white/5 border border-white/10 p-4">
+        <div class="flex items-center justify-between">
+          <h2 class="font-bold text-base">Legend</h2>
+          <span class="text-xs text-slate-300">Edges = Threads</span>
+        </div>
+
+        <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-3 h-3 rounded-full bg-rose-400"></span>
+            <span class="text-slate-200">Oxidation</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-3 h-3 rounded-full bg-emerald-400"></span>
+            <span class="text-slate-200">Reduction</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-3 h-3 rounded-full bg-sky-400"></span>
+            <span class="text-slate-200">Substitution</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-3 h-3 rounded-full bg-amber-400"></span>
+            <span class="text-slate-200">Elimination</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-3 h-3 rounded-full bg-violet-400"></span>
+            <span class="text-slate-200">Addition</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block w-3 h-3 rounded-full bg-cyan-300"></span>
+            <span class="text-slate-200">Aromatic</span>
+          </div>
+        </div>
+
+        <div class="mt-4 text-xs text-slate-300 leading-relaxed">
+          Tip: Use filters to show only certain reaction types. Use search to highlight both nodes and threads.
+        </div>
+      </section>
+
+      <section class="rounded-3xl bg-white/5 border border-white/10 p-4">
+        <div class="flex items-center justify-between">
+          <h2 class="font-bold text-base">Filters</h2>
+          <button id="clearFilters" class="text-xs text-sky-300 hover:text-sky-200">Clear</button>
+        </div>
+
+        <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+          <label class="flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-3 py-2 hover:bg-white/10 cursor-pointer">
+            <input type="checkbox" class="accent-rose-400" data-filter="oxidation" checked />
+            <span>Oxidation</span>
+          </label>
+          <label class="flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-3 py-2 hover:bg-white/10 cursor-pointer">
+            <input type="checkbox" class="accent-emerald-400" data-filter="reduction" checked />
+            <span>Reduction</span>
+          </label>
+          <label class="flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-3 py-2 hover:bg-white/10 cursor-pointer">
+            <input type="checkbox" class="accent-sky-400" data-filter="substitution" checked />
+            <span>Substitution</span>
+          </label>
+          <label class="flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-3 py-2 hover:bg-white/10 cursor-pointer">
+            <input type="checkbox" class="accent-amber-400" data-filter="elimination" checked />
+            <span>Elimination</span>
+          </label>
+          <label class="flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-3 py-2 hover:bg-white/10 cursor-pointer">
+            <input type="checkbox" class="accent-violet-400" data-filter="addition" checked />
+            <span>Addition</span>
+          </label>
+          <label class="flex items-center gap-2 rounded-2xl bg-white/5 border border-white/10 px-3 py-2 hover:bg-white/10 cursor-pointer">
+            <input type="checkbox" class="accent-cyan-300" data-filter="aromatic" checked />
+            <span>Aromatic</span>
+          </label>
+        </div>
+
+        <div class="mt-4 text-xs text-slate-300">
+          Zoom: <span class="text-slate-100 font-semibold">Mouse wheel / trackpad</span> • Pan: <span class="text-slate-100 font-semibold">Drag empty space</span>
+        </div>
+      </section>
+
+      <section class="rounded-3xl bg-white/5 border border-white/10 p-4">
+        <h2 class="font-bold text-base">Exam Fast Lanes 🧠</h2>
+        <ul class="mt-2 text-sm text-slate-200 space-y-2 list-disc pl-5">
+          <li>Alcohol → Aldehyde/Ketone → Acid</li>
+          <li>Acid ↔ Ester ↔ Amide (derivatives)</li>
+          <li>Haloalkane ↔ Alcohol ↔ Alkene</li>
+          <li>Benzene → Nitro → Aniline → Diazonium → Phenol / Halo / CN</li>
+        </ul>
+      </section>
+    </aside>
+
+    <section class="col-span-12 lg:col-span-6">
+      <div class="rounded-3xl bg-white/5 border border-white/10 overflow-hidden relative">
+        <div class="absolute z-30 top-3 left-3 rounded-2xl bg-slate-950/60 border border-white/10 px-3 py-2 text-xs text-slate-200 glass">
+          <div class="font-semibold">Controls</div>
+          <div class="text-slate-300">Drag to pan • Wheel to zoom • Click node to open details</div>
+        </div>
+
+        <div id="viewport" class="h-[78vh] no-select grab relative overflow-hidden" aria-label="Roadmap canvas">
+          <div id="world" class="absolute left-0 top-0 w-[2200px] h-[1500px]">
+            <div class="absolute inset-0">
+              <div class="absolute left-[40px] top-[60px] w-[650px] h-[420px] rounded-[36px] border border-white/10 bg-gradient-to-br from-white/5 to-white/0"></div>
+              <div class="absolute left-[750px] top-[60px] w-[700px] h-[420px] rounded-[36px] border border-white/10 bg-gradient-to-br from-white/5 to-white/0"></div>
+              <div class="absolute left-[1510px] top-[60px] w-[650px] h-[420px] rounded-[36px] border border-white/10 bg-gradient-to-br from-white/5 to-white/0"></div>
+
+              <div class="absolute left-[40px] top-[520px] w-[860px] h-[460px] rounded-[36px] border border-white/10 bg-gradient-to-br from-white/5 to-white/0"></div>
+              <div class="absolute left-[930px] top-[520px] w-[760px] h-[460px] rounded-[36px] border border-white/10 bg-gradient-to-br from-white/5 to-white/0"></div>
+              <div class="absolute left-[40px] top-[1020px] w-[1100px] h-[420px] rounded-[36px] border border-white/10 bg-gradient-to-br from-white/5 to-white/0"></div>
+              <div class="absolute left-[1180px] top-[1020px] w-[980px] h-[420px] rounded-[36px] border border-white/10 bg-gradient-to-br from-white/5 to-white/0"></div>
+
+              <div class="absolute left-[70px] top-[80px] text-sm text-slate-300 font-semibold tracking-wide">Hydrocarbons</div>
+              <div class="absolute left-[780px] top-[80px] text-sm text-slate-300 font-semibold tracking-wide">Halogen & Organometallic Hub</div>
+              <div class="absolute left-[1540px] top-[80px] text-sm text-slate-300 font-semibold tracking-wide">Aromatic Zone</div>
+
+              <div class="absolute left-[70px] top-[540px] text-sm text-slate-300 font-semibold tracking-wide">Alcohol / Ether Zone</div>
+              <div class="absolute left-[960px] top-[540px] text-sm text-slate-300 font-semibold tracking-wide">Carbonyl Zone</div>
+
+              <div class="absolute left-[70px] top-[1040px] text-sm text-slate-300 font-semibold tracking-wide">Carboxylic Acid & Derivatives Highway</div>
+              <div class="absolute left-[1210px] top-[1040px] text-sm text-slate-300 font-semibold tracking-wide">Nitrogen Zone</div>
+            </div>
+
+            <svg id="edgesSvg" class="absolute left-0 top-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                  <path d="M0,0 L10,3 L0,6 z" fill="rgba(226,232,240,0.75)"></path>
+                </marker>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="2.2" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+            </svg>
+
+            <div id="nodesLayer" class="absolute left-0 top-0 w-full h-full"></div>
+                      </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="col-span-12 lg:col-span-3 space-y-4">
+      <section class="rounded-3xl bg-white/5 border border-white/10 p-4">
+        <div class="flex items-center justify-between">
+          <h2 class="font-bold text-base">Details Panel</h2>
+          <button id="closeDetails" class="text-xs text-slate-300 hover:text-slate-200">Close</button>
+        </div>
+
+        <div id="details" class="mt-3">
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+            Click any node on the map to see:
+            <ul class="mt-2 list-disc pl-5 text-slate-300 space-y-1">
+              <li>What it is</li>
+              <li>Common preparations</li>
+              <li>Key conversions + reagents</li>
+              <li>Board favorite notes</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-3xl bg-white/5 border border-white/10 p-4">
+        <h2 class="font-bold text-base">Study Hack 🥳</h2>
+        <div class="mt-2 text-sm text-slate-300 leading-relaxed">
+          Use this map like a game:
+          <div class="mt-2 space-y-2">
+            <div class="rounded-2xl bg-white/5 border border-white/10 p-3">
+              <div class="font-semibold text-slate-200">Level 1</div>
+              Trace any path from <span class="text-slate-100 font-semibold">Alkene → Alcohol → Carbonyl → Acid → Ester</span>.
+            </div>
+            <div class="rounded-2xl bg-white/5 border border-white/10 p-3">
+              <div class="font-semibold text-slate-200">Level 2</div>
+              Convert <span class="text-slate-100 font-semibold">Benzene → Phenol</span> using diazonium route.
+            </div>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <script>
+    const nodes = [
+      { id:"alkane", title:"Alkane", formula:"R-H", zone:"Hydrocarbons", x:140, y:170,
+        tags:["hydrocarbon"], notes:[
+          "Less reactive. Main reactions: substitution (radical halogenation), combustion.",
+          "Convert to haloalkane via Cl2/Br2, hv (free-radical)."
+        ],
+        prep:["Hydrogenation of alkene/alkyne (H2/Ni or Pt)."],
+        outs:["Alkane → Haloalkane (Cl2/Br2, hv)"]
+      },
+      { id:"alkene", title:"Alkene", formula:"C=C", zone:"Hydrocarbons", x:320, y:120,
+        tags:["hydrocarbon","addition"], notes:[
+          "Very important hub: addition, oxidation, hydration, polymerization.",
+          "Board king: hydration → alcohol, oxidation → diol / cleavage."
+        ],
+        prep:["Dehydration of alcohol (conc. H2SO4, heat)", "Dehydrohalogenation of haloalkane (alc. KOH, heat)"],
+        outs:["Alkene → Alcohol (H2O/H+)", "Alkene → Haloalkane (HX)", "Alkene → Alkane (H2/Ni)"]
+      },
+      { id:"alkyne", title:"Alkyne", formula:"C≡C", zone:"Hydrocarbons", x:520, y:210,
+        tags:["hydrocarbon","addition"], notes:[
+          "Addition reactions; partial hydrogenation gives alkene.",
+          "Terminal alkyne forms acetylide (strong base) → C–C bond formation."
+        ],
+        prep:["Double dehydrohalogenation of dihaloalkane (strong base)."],
+        outs:["Alkyne → Alkene (H2/Lindlar)", "Alkyne → Alkane (H2/Ni)", "Alkyne → Carbonyl (hydration routes)"]
+      },
+
+      { id:"haloalkane", title:"Haloalkane", formula:"R–X", zone:"Halo Hub", x:890, y:160,
+        tags:["substitution","elimination"], notes:[
+          "Major junction: SN1/SN2 substitution; elimination gives alkene.",
+          "Aqueous KOH → alcohol; Alcoholic KOH → alkene."
+        ],
+        prep:["From alkane (X2, hv)", "From alkene (HX / X2 addition)"],
+        outs:["R–X → ROH (aq. KOH)", "R–X → Alkene (alc. KOH, heat)", "R–X → RMgX (Mg, dry ether)"]
+      },
+      { id:"grignard", title:"Grignard Reagent", formula:"RMgX", zone:"Halo Hub", x:1120, y:110,
+        tags:["addition"], notes:[
+          "C–C bond builder: attacks carbonyls → alcohols after workup.",
+          "Needs dry conditions (no water)."
+        ],
+        prep:["R–X + Mg (dry ether) → RMgX"],
+        outs:["RMgX + Carbonyl → Alcohol (then H3O+)","RMgX + CO2 → Carboxylic acid (then H3O+)"]
+      },
+      { id:"dihalo", title:"Dihaloalkane", formula:"R–X2", zone:"Halo Hub", x:1180, y:250,
+        tags:["substitution","elimination"], notes:[
+          "Can lead to alkynes by double elimination.",
+          "Vicinal dihalides are common in elimination routes."
+        ],
+        prep:["Alkene + X2 → vicinal dihalide"],
+        outs:["Dihalo → Alkyne (strong base, double elimination)"]
+      },
+
+      { id:"benzene", title:"Benzene", formula:"C6H6", zone:"Aromatic", x:1650, y:160,
+        tags:["aromatic"], notes:[
+          "EAS hub: nitration, halogenation, sulfonation, Friedel–Crafts.",
+          "Board route: Benzene → Nitrobenzene → Aniline → Diazonium → Phenol / Halobenzene / CN."
+        ],
+        prep:["From acetylene trimerization (special) / petroleum sources (concept)."],
+        outs:["Benzene → Nitro (HNO3/H2SO4)","Benzene → Halo (Cl2/FeCl3)","Benzene → Sulfonic acid (SO3/H2SO4)"]
+      },
+      { id:"nitrobenz", title:"Nitrobenzene", formula:"C6H5NO2", zone:"Aromatic", x:1860, y:110,
+        tags:["aromatic","reduction"], notes:[
+          "Key intermediate: reduce to aniline.",
+          "Strongly deactivating group in EAS."
+        ],
+        prep:["Nitration of benzene (conc. HNO3/H2SO4)"],
+        outs:["Nitro → Aniline (Sn/HCl or Fe/HCl or H2/Ni)"]
+      },
+      { id:"aniline", title:"Aniline", formula:"C6H5NH2", zone:"Aromatic", x:1860, y:210,
+        tags:["aromatic","substitution"], notes:[
+          "Diazotization at 0–5°C gives diazonium salt (important!).",
+          "Activating group in EAS (but needs protection sometimes)."
+        ],
+        prep:["Reduce nitrobenzene"],
+        outs:["Aniline → Diazonium (NaNO2/HCl, 0–5°C)"]
+      },
+      { id:"diazonium", title:"Diazonium Salt", formula:"Ar–N2+Cl−", zone:"Aromatic", x:2040, y:210,
+        tags:["aromatic","substitution"], notes:[
+          "Super useful: replace N2+ with OH, Cl, Br, I, CN.",
+          "Board favorites: Phenol (warm water), Sandmeyer (CuCl/CuBr), KI, CuCN."
+        ],
+        prep:["Aniline + NaNO2/HCl at 0–5°C"],
+        outs:["Diazonium → Phenol (warm H2O)","Diazonium → ArCl/ArBr (CuCl/CuBr)","Diazonium → ArCN (CuCN)"]
+      },
+      { id:"phenol", title:"Phenol", formula:"Ar–OH", zone:"Aromatic", x:2040, y:110,
+        tags:["aromatic","oxidation","substitution"], notes:[
+          "Weak acid. Undergoes EAS easily.",
+          "For boards: focus on phenol reactions + diazonium route."
+        ],
+        prep:["Diazonium hydrolysis (warm water)"],
+        outs:["Phenol → Ether (Williamson, via phenoxide + R–X)","Phenol → Benzoquinone (oxidation, concept)"]
+      },
+            { id:"alcohol1", title:"1° Alcohol", formula:"RCH2OH", zone:"Alcohol", x:200, y:640,
+        tags:["oxidation","substitution","elimination"], notes:[
+          "Oxidation: 1° alcohol → aldehyde (PCC) → acid (KMnO4).",
+          "Dehydration: alcohol → alkene (conc. H2SO4, heat).",
+          "Substitution: ROH → R–X (HX / SOCl2 / PBr3)."
+        ],
+        prep:["Hydration of alkene", "Reduction of aldehyde", "Grignard + formaldehyde (gives 1° alcohol)"],
+        outs:["1° ROH → Aldehyde (PCC)","1° ROH → Alkene (conc. H2SO4, heat)","1° ROH → R–X (SOCl2/PBr3)"]
+      },
+      { id:"alcohol2", title:"2° Alcohol", formula:"R2CHOH", zone:"Alcohol", x:420, y:720,
+        tags:["oxidation","substitution","elimination"], notes:[
+          "Oxidation: 2° alcohol → ketone (PCC / K2Cr2O7).",
+          "Dehydration → alkene.",
+          "Substitution to haloalkane possible."
+        ],
+        prep:["Hydration of alkene", "Reduction of ketone", "Grignard + aldehyde (gives 2° alcohol)"],
+        outs:["2° ROH → Ketone (PCC/K2Cr2O7)","2° ROH → Alkene (conc. H2SO4, heat)"]
+      },
+      { id:"alcohol3", title:"3° Alcohol", formula:"R3COH", zone:"Alcohol", x:640, y:640,
+        tags:["elimination","substitution"], notes:[
+          "Hard to oxidize (no H on carbon bearing OH).",
+          "Dehydration gives alkene easily."
+        ],
+        prep:["Grignard + ketone (gives 3° alcohol)"],
+        outs:["3° ROH → Alkene (conc. H2SO4, heat)","3° ROH → R–X (HX)"]
+      },
+      { id:"ether", title:"Ether", formula:"R–O–R", zone:"Alcohol", x:520, y:860,
+        tags:["substitution"], notes:[
+          "Common prep: Williamson ether synthesis.",
+          "Cleavage by HI/HBr (strong acids)."
+        ],
+        prep:["RO− + R–X (Williamson)"],
+        outs:["Ether → Alcohol/Halo (HI/HBr, heat)"]
+      },
+
+      { id:"aldehyde", title:"Aldehyde", formula:"R–CHO", zone:"Carbonyl", x:1020, y:650,
+        tags:["oxidation","reduction","addition"], notes:[
+          "Oxidation → carboxylic acid (KMnO4 / Tollens).",
+          "Reduction → 1° alcohol (NaBH4/LiAlH4)."
+        ],
+        prep:["Oxidation of 1° alcohol (PCC)"],
+        outs:["Aldehyde → 1° Alcohol (NaBH4/LiAlH4)","Aldehyde → Acid (KMnO4)"]
+      },
+      { id:"ketone", title:"Ketone", formula:"R–CO–R", zone:"Carbonyl", x:1250, y:760,
+        tags:["reduction","addition"], notes:[
+          "Reduction → 2° alcohol (NaBH4/LiAlH4).",
+          "Addition reactions; not oxidized easily in basic syllabus."
+        ],
+        prep:["Oxidation of 2° alcohol"],
+        outs:["Ketone → 2° Alcohol (NaBH4/LiAlH4)","Ketone + RMgX → 3° Alcohol (then H3O+)"]
+      },
+
+      { id:"acid", title:"Carboxylic Acid", formula:"R–COOH", zone:"Acid", x:260, y:1140,
+        tags:["substitution","reduction"], notes:[
+          "Central for derivatives: acid chloride, ester, amide.",
+          "From aldehyde oxidation / Grignard + CO2."
+        ],
+        prep:["Aldehyde oxidation (KMnO4)", "RMgX + CO2 then H3O+"],
+        outs:["Acid → Acid Chloride (SOCl2/PCl5)","Acid → Ester (ROH, H+, reflux)","Acid → Salt (NaOH)"]
+      },
+      { id:"acidchloride", title:"Acid Chloride", formula:"R–COCl", zone:"Acid", x:520, y:1080,
+        tags:["substitution"], notes:[
+          "Most reactive derivative: makes ester, amide, anhydride easily.",
+          "Hydrolysis gives back acid."
+        ],
+        prep:["Acid + SOCl2 / PCl5"],
+        outs:["RCOCl → Ester (ROH/pyridine)","RCOCl → Amide (NH3/amine)","RCOCl → Acid (H2O)"]
+      },
+      { id:"anhydride", title:"Anhydride", formula:"(RCO)2O", zone:"Acid", x:760, y:1200,
+        tags:["substitution"], notes:[
+          "Reactive acylating agent; less reactive than acid chloride.",
+          "Forms ester or amide."
+        ],
+        prep:["Acid chloride + carboxylate salt (concept)"],
+        outs:["Anhydride → Ester (ROH)","Anhydride → Amide (NH3/amine)"]
+      },
+      { id:"ester", title:"Ester", formula:"R–COOR", zone:"Acid", x:560, y:1320,
+        tags:["substitution","reduction"], notes:[
+          "Fischer esterification: acid + alcohol + H+.",
+          "Hydrolysis: acidic or basic (saponification)."
+        ],
+        prep:["Acid + ROH + H+ (reflux)", "Acid chloride + ROH"],
+        outs:["Ester → Acid (H+/H2O, reflux)","Ester → Salt + ROH (NaOH, heat)"]
+      },
+      { id:"amide", title:"Amide", formula:"R–CONH2", zone:"Acid", x:860, y:1320,
+        tags:["substitution","reduction"], notes:[
+          "From acid chloride/anhydride/ester + ammonia/amine.",
+          "Hydrolysis gives acid / salt."
+        ],
+        prep:["Acid chloride + NH3", "Ester + NH3 (heat)"],
+        outs:["Amide → Acid (H+/H2O, heat)","Amide → Amine (LiAlH4)"]
+      },
+
+      { id:"nitrile", title:"Nitrile", formula:"R–C≡N", zone:"Nitrogen", x:1320, y:1140,
+        tags:["reduction","addition"], notes:[
+          "From R–X + KCN (SN2) → nitrile.",
+          "Hydrolysis → carboxylic acid (heat).",
+          "Reduction → amine."
+        ],
+        prep:["Haloalkane + KCN (alc.)"],
+        outs:["Nitrile → Acid (H+/H2O, heat)","Nitrile → Amine (H2/Ni or LiAlH4)"]
+      },
+      { id:"amine", title:"Amine", formula:"R–NH2", zone:"Nitrogen", x:1560, y:1260,
+        tags:["substitution","reduction"], notes:[
+          "Basic. Made by reduction of nitro/nitrile/amide (concept).",
+          "Aromatic amines do diazotization (key syllabus)."
+        ],
+        prep:["Reduce nitrile or amide (concept)"],
+        outs:["Amine → Amide (acylation)","Aniline → Diazotization (NaNO2/HCl, 0–5°C)"]
+      },
+      { id:"nitro", title:"Nitro (Aliphatic)", formula:"R–NO2", zone:"Nitrogen", x:1560, y:1100,
+        tags:["reduction"], notes:[
+          "Reduction gives amine (common concept).",
+          "Aromatic nitro is a major board path."
+        ],
+        prep:["Nitration (advanced), usually focus aromatic nitro in syllabus."],
+        outs:["Nitro → Amine (Sn/HCl or H2/Ni)"]
+      },
+    ];
+
+    const edges = [
+      { from:"alkane", to:"haloalkane", type:"substitution", label:"Cl2/Br2, hv" },
+      { from:"alkene", to:"alcohol1", type:"addition", label:"H2O/H+ (hydration)" },
+      { from:"alkene", to:"haloalkane", type:"addition", label:"HX (Markov.)" },
+      { from:"alkene", to:"alkane", type:"reduction", label:"H2/Ni" },
+      { from:"alkyne", to:"alkene", type:"reduction", label:"H2/Lindlar" },
+      { from:"alkyne", to:"alkane", type:"reduction", label:"H2/Ni" },
+
+      { from:"haloalkane", to:"alcohol1", type:"substitution", label:"aq. KOH" },
+      { from:"haloalkane", to:"alkene", type:"elimination", label:"alc. KOH, heat" },
+      { from:"haloalkane", to:"grignard", type:"addition", label:"Mg, dry ether" },
+      { from:"alkene", to:"dihalo", type:"addition", label:"X2 (Cl2/Br2)" },
+      { from:"dihalo", to:"alkyne", type:"elimination", label:"strong base ×2" },
+
+      { from:"alcohol1", to:"alkene", type:"elimination", label:"conc. H2SO4, heat" },
+      { from:"alcohol2", to:"alkene", type:"elimination", label:"conc. H2SO4, heat" },
+      { from:"alcohol3", to:"alkene", type:"elimination", label:"conc. H2SO4, heat" },
+      { from:"alcohol1", to:"haloalkane", type:"substitution", label:"SOCl2 / PBr3" },
+      { from:"ether", to:"alcohol1", type:"substitution", label:"HI/HBr, heat" },
+
+      { from:"alcohol1", to:"aldehyde", type:"oxidation", label:"PCC" },
+      { from:"aldehyde", to:"alcohol1", type:"reduction", label:"NaBH4 / LiAlH4" },
+      { from:"alcohol2", to:"ketone", type:"oxidation", label:"PCC / K2Cr2O7" },
+      { from:"ketone", to:"alcohol2", type:"reduction", label:"NaBH4 / LiAlH4" },
+      { from:"aldehyde", to:"acid", type:"oxidation", label:"KMnO4 / Tollens" },
+
+      { from:"acid", to:"acidchloride", type:"substitution", label:"SOCl2 / PCl5" },
+      { from:"acidchloride", to:"ester", type:"substitution", label:"ROH, pyridine" },
+      { from:"acidchloride", to:"amide", type:"substitution", label:"NH3 / amine" },
+      { from:"acid", to:"ester", type:"substitution", label:"ROH, H+, reflux" },
+      { from:"ester", to:"acid", type:"substitution", label:"H+/H2O, reflux" },
+      { from:"ester", to:"acid", type:"substitution", label:"NaOH (sapon.) → salt; then H+" },
+      { from:"anhydride", to:"ester", type:"substitution", label:"ROH" },
+      { from:"anhydride", to:"amide", type:"substitution", label:"NH3 / amine" },
+
+      { from:"haloalkane", to:"nitrile", type:"substitution", label:"KCN (alc.), SN2" },
+      { from:"nitrile", to:"acid", type:"substitution", label:"H+/H2O, heat" },
+      { from:"nitrile", to:"amine", type:"reduction", label:"H2/Ni or LiAlH4" },
+      { from:"nitro", to:"amine", type:"reduction", label:"Sn/HCl or H2/Ni" },
+
+      { from:"benzene", to:"nitrobenz", type:"aromatic", label:"HNO3/H2SO4" },
+      { from:"nitrobenz", to:"aniline", type:"reduction", label:"Sn/HCl or H2/Ni" },
+      { from:"aniline", to:"diazonium", type:"aromatic", label:"NaNO2/HCl, 0–5°C" },
+      { from:"diazonium", to:"phenol", type:"aromatic", label:"warm H2O" },
+    ];
+        const typeColor = {
+      oxidation: "rgba(251,113,133,0.95)",
+      reduction: "rgba(52,211,153,0.95)",
+      substitution: "rgba(56,189,248,0.95)",
+      elimination: "rgba(251,191,36,0.95)",
+      addition: "rgba(167,139,250,0.95)",
+      aromatic: "rgba(103,232,249,0.95)"
+    };
+
+    const nodesLayer = document.getElementById("nodesLayer");
+    const edgesSvg = document.getElementById("edgesSvg");
+    const detailsEl = document.getElementById("details");
+    const nodeById = Object.fromEntries(nodes.map(n => [n.id, n]));
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[c]));
+    }
+
+    function makeNodeEl(n) {
+      const el = document.createElement("button");
+      el.className =
+        "absolute rounded-3xl border border-white/10 bg-slate-950/50 hover:bg-white/10 transition " +
+        "px-4 py-3 text-left w-[220px] shadow-soft focus:outline-none focus:ring-2 focus:ring-sky-400/25";
+      el.style.left = n.x + "px";
+      el.style.top = n.y + "px";
+      el.dataset.nodeId = n.id;
+
+      el.innerHTML = `
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <div class="font-bold text-slate-50 leading-tight">${escapeHtml(n.title)}</div>
+            <div class="text-xs text-slate-300 mt-0.5">${escapeHtml(n.formula)}</div>
+          </div>
+          <div class="text-xs text-slate-300">📌</div>
+        </div>
+        <div class="mt-2 flex flex-wrap gap-1">
+          ${(n.tags||[]).map(t => `<span class="text-[10px] px-2 py-1 rounded-full bg-white/5 border border-white/10 text-slate-200">${escapeHtml(t)}</span>`).join("")}
+        </div>
+      `;
+
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openDetails(n.id);
+        highlightSelection(n.id);
+      });
+
+      return el;
+    }
+
+    function renderNodes() {
+      nodesLayer.innerHTML = "";
+      for (const n of nodes) nodesLayer.appendChild(makeNodeEl(n));
+    }
+
+    function nodeCenter(nid) {
+      const n = nodeById[nid];
+      return { cx: n.x + 110, cy: n.y + 52 };
+    }
+
+    function drawEdgePath(a, b) {
+      const dx = b.cx - a.cx;
+      const dy = b.cy - a.cy;
+      const curvature = Math.min(180, Math.max(60, Math.hypot(dx, dy) * 0.25));
+      const c1x = a.cx + (dx * 0.35);
+      const c1y = a.cy + (dy * 0.05) - curvature * 0.15;
+      const c2x = a.cx + (dx * 0.65);
+      const c2y = a.cy + (dy * 0.95) + curvature * 0.15;
+      return `M ${a.cx} ${a.cy} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${b.cx} ${b.cy}`;
+    }
+
+    function renderEdges(activeTypes, searchTerm) {
+      edgesSvg.querySelectorAll("[data-edge]").forEach(x => x.remove());
+      edgesSvg.querySelectorAll("[data-label]").forEach(x => x.remove());
+
+      const term = (searchTerm || "").trim().toLowerCase();
+
+      for (const e of edges) {
+        if (!activeTypes.has(e.type)) continue;
+
+        const a = nodeCenter(e.from);
+        const b = nodeCenter(e.to);
+
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const col = typeColor[e.type] || "rgba(226,232,240,0.8)";
+        path.setAttribute("d", drawEdgePath(a, b));
+        path.setAttribute("stroke", col);
+        path.setAttribute("stroke-width", "2.5");
+        path.setAttribute("fill", "none");
+        path.setAttribute("marker-end", "url(#arrow)");
+        path.setAttribute("opacity", "0.9");
+        path.setAttribute("filter", "url(#glow)");
+        path.dataset.edge = "1";
+
+        const edgeText = (e.label + " " + e.type + " " + e.from + " " + e.to).toLowerCase();
+        const matches = term && edgeText.includes(term);
+        if (term && !matches) path.setAttribute("opacity", "0.15");
+        if (matches) path.setAttribute("stroke-width", "4.2");
+
+        edgesSvg.appendChild(path);
+
+        const mx = (a.cx + b.cx) / 2;
+        const my = (a.cy + b.cy) / 2;
+
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.dataset.label = "1";
+
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", mx - 70);
+        rect.setAttribute("y", my - 12);
+        rect.setAttribute("rx", "10");
+        rect.setAttribute("ry", "10");
+        rect.setAttribute("width", "140");
+        rect.setAttribute("height", "24");
+        rect.setAttribute("fill", "rgba(2,6,23,0.70)");
+        rect.setAttribute("stroke", "rgba(255,255,255,0.12)");
+
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", mx);
+        text.setAttribute("y", my + 5);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("font-size", "11");
+        text.setAttribute("fill", "rgba(226,232,240,0.92)");
+        text.textContent = e.label;
+
+        if (term && !matches) {
+          rect.setAttribute("opacity", "0.18");
+          text.setAttribute("opacity", "0.18");
+        }
+        if (matches) {
+          rect.setAttribute("stroke", col);
+          rect.setAttribute("opacity", "0.95");
+          text.setAttribute("opacity", "1");
+        }
+
+        g.appendChild(rect);
+        g.appendChild(text);
+        edgesSvg.appendChild(g);
+      }
+    }
+
+    function openDetails(nodeId) {
+      const n = nodeById[nodeId];
+      if (!n) return;
+
+      detailsEl.innerHTML = `
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <div class="text-lg font-bold text-slate-50">${escapeHtml(n.title)}</div>
+              <div class="text-sm text-slate-300">${escapeHtml(n.formula)} • <span class="text-slate-200 font-semibold">${escapeHtml(n.zone)}</span></div>
+            </div>
+            <div class="text-2xl">⚗️</div>
+          </div>
+
+          <div class="mt-3 flex flex-wrap gap-1">
+            ${(n.tags||[]).map(t => `<span class="text-[11px] px-2 py-1 rounded-full bg-white/5 border border-white/10">${escapeHtml(t)}</span>`).join("")}
+          </div>
+
+          <div class="mt-4">
+            <div class="text-sm font-semibold text-slate-200">Key Notes</div>
+            <ul class="mt-2 text-sm text-slate-300 space-y-1 list-disc pl-5">
+              ${(n.notes||[]).map(x => `<li>${escapeHtml(x)}</li>`).join("")}
+            </ul>
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 gap-3">
+            <div class="rounded-2xl bg-slate-950/40 border border-white/10 p-3">
+              <div class="text-sm font-semibold text-slate-200">Common Preparations</div>
+              <ul class="mt-2 text-sm text-slate-300 space-y-1 list-disc pl-5">
+                ${(n.prep||[]).map(x => `<li>${escapeHtml(x)}</li>`).join("")}
+              </ul>
+            </div>
+
+            <div class="rounded-2xl bg-slate-950/40 border border-white/10 p-3">
+              <div class="text-sm font-semibold text-slate-200">Fast Conversions OUT</div>
+              <ul class="mt-2 text-sm text-slate-300 space-y-1 list-disc pl-5">
+                ${(n.outs||[]).map(x => `<li>${escapeHtml(x)}</li>`).join("")}
+              </ul>
+            </div>
+          </div>
+
+          <div class="mt-4 text-xs text-slate-400">
+            Tip: Use Search to highlight reagents (KMnO4, PCC, SOCl2, NaNO2/HCl).
+          </div>
+        </div>
+      `;
+    }
+
+    let selectedNodeId = null;
+    function highlightSelection(nodeId) {
+      selectedNodeId = nodeId;
+      document.querySelectorAll("[data-node-id]").forEach(el => {
+        const id = el.dataset.nodeId;
+        if (id === nodeId) el.classList.add("ring-2","ring-sky-400/40");
+        else el.classList.remove("ring-2","ring-sky-400/40");
+      });
+    }
+
+    const viewport = document.getElementById("viewport");
+    const world = document.getElementById("world");
+
+    let scale = 1, tx = -80, ty = -40;
+
+    function applyTransform() {
+      world.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+      world.style.transformOrigin = "0 0";
+    }
+    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+    let isPanning = false;
+    let panStart = { x:0, y:0, tx:0, ty:0 };
+
+    viewport.addEventListener("mousedown", (e) => {
+      if (e.target.closest("[data-node-id]")) return;
+      isPanning = true;
+      viewport.classList.remove("grab");
+      viewport.classList.add("grabbing");
+      panStart = { x: e.clientX, y: e.clientY, tx, ty };
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!isPanning) return;
+      tx = panStart.tx + (e.clientX - panStart.x);
+      ty = panStart.ty + (e.clientY - panStart.y);
+      applyTransform();
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (!isPanning) return;
+      isPanning = false;
+      viewport.classList.remove("grabbing");
+      viewport.classList.add("grab");
+    });
+
+    viewport.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      const rect = viewport.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+
+      const ds = Math.exp((-e.deltaY) * 0.0016);
+      const newScale = clamp(scale * ds, 0.5, 2.2);
+
+      const wx = (mx - tx) / scale;
+      const wy = (my - ty) / scale;
+
+      tx = mx - wx * newScale;
+      ty = my - wy * newScale;
+      scale = newScale;
+      applyTransform();
+    }, { passive:false });
+
+    document.getElementById("resetView").addEventListener("click", () => {
+      scale = 1; tx = -80; ty = -40; applyTransform();
+    });
+
+    function getActiveTypes() {
+      const set = new Set();
+      document.querySelectorAll("input[data-filter]").forEach(cb => {
+        if (cb.checked) set.add(cb.dataset.filter);
+      });
+      return set;
+    }
+
+    function applySearchHighlight(term) {
+      const t = (term || "").trim().toLowerCase();
+      document.querySelectorAll("[data-node-id]").forEach(el => {
+        const n = nodeById[el.dataset.nodeId];
+        const text = (n.title + " " + n.formula + " " + n.zone + " " + (n.tags||[]).join(" ") + " " + (n.notes||[]).join(" ") + " " + (n.outs||[]).join(" ") + " " + (n.prep||[]).join(" ")).toLowerCase();
+        if (!t) { el.style.opacity = "1"; el.classList.remove("ring-2","ring-fuchsia-400/25"); return; }
+        const match = text.includes(t);
+        el.style.opacity = match ? "1" : "0.35";
+        if (match) el.classList.add("ring-2","ring-fuchsia-400/25");
+        else el.classList.remove("ring-2","ring-fuchsia-400/25");
+      });
+    }
+
+    function refreshRender() {
+      const active = getActiveTypes();
+      const term = document.getElementById("search").value;
+      renderEdges(active, term);
+      applySearchHighlight(term);
+    }
+
+    document.querySelectorAll("input[data-filter]").forEach(cb => cb.addEventListener("change", refreshRender));
+    document.getElementById("search").addEventListener("input", refreshRender);
+
+    document.getElementById("clearFilters").addEventListener("click", () => {
+      document.querySelectorAll("input[data-filter]").forEach(cb => cb.checked = true);
+      refreshRender();
+    });
+
+    document.getElementById("closeDetails").addEventListener("click", () => {
+      detailsEl.innerHTML = `<div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">Click any node to open details again.</div>`;
+      selectedNodeId = null;
+      document.querySelectorAll("[data-node-id]").forEach(el => el.classList.remove("ring-2","ring-sky-400/40"));
+    });
+
+    viewport.addEventListener("click", (e) => {
+      if (e.target.closest("[data-node-id]")) return;
+      selectedNodeId = null;
+      document.querySelectorAll("[data-node-id]").forEach(el => el.classList.remove("ring-2","ring-sky-400/40"));
+    });
+
+    renderNodes();
+    applyTransform();
+    refreshRender();
+    openDetails("alkene");
+    highlightSelection("alkene");
+  </script>
+</body>
+</html>
